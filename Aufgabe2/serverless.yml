@@ -1,0 +1,78 @@
+service: DSG-Task2-J
+
+frameworkVersion: '2 || 3'
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  region: eu-central-1
+
+functions:
+  readItem:
+    handler: readItem.readItem
+    iamRoleStatementsName: readItem
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: "dynamodb:GetItem"        
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+  writeItem:
+    handler: writeItem.writeItem
+    iamRoleStatementsName: writeItem
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action: "dynamodb:PutItem"        
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+  updateItem:
+    handler: update.updatePrio
+    iamRoleStatementsName: updateItem
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: "dynamodb:UpdateItem"
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+  deleteItem:
+    handler: delete.deleteItem
+    iamRoleStatementsName: deleteItem
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: "dynamodb:DeleteItem"        
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+  specialFunction:
+    handler: function.specialFunction
+    iamRoleStatementsName: specialFunction
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: "dynamodb:Scan"        
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+  updatePrio:
+    handler: update.updatePrio
+    iamRoleStatementsName: updatePrio
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: 
+          - "dynamodb:Query"
+          - "dynamodb:UpdateItem"      
+        Resource: "arn:aws:dynamodb:eu-central-1:524748656081:table/vaccTable"
+
+plugins:
+  - serverless-iam-roles-per-function
+
+resources:
+  Resources:
+    vaccTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: vaccTable
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: N
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
