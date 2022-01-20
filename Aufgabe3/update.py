@@ -231,7 +231,7 @@ def updatePrio(event, context):
         sysrel = False
 
     try:
-        healthPr = entry["Items"][0]["Vorerkrankung"]
+        healthPr = entry["Items"][0]["Vorerkrankungen"]
     except KeyError as e:
         healthPr = False
 
@@ -301,7 +301,7 @@ def updateOldData(event, context):
                 Key={
                     'ID': entry['ID']
                 },
-                UpdateExpression="SET Systemrelevanz= :s, Vorerkrankung= :vo, Version= :ve",
+                UpdateExpression="SET Systemrelevanz= :s, Vorerkrankungen= :vo, Version= :ve",
                 ExpressionAttributeValues={
                     ':s': False,
                     ':vo': False,
@@ -311,4 +311,4 @@ def updateOldData(event, context):
             )
         return "Sucess"
     except KeyError as e:
-        return e
+        return "Something went wrong ..."

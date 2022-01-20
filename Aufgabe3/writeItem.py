@@ -19,7 +19,7 @@ def writeItem(event, context):
         ((today.month, today.day) < (birthDate.month, birthDate.day))
 
     sysRel = event["systemrelevanz"]
-    vorerkrankung = event["vorerkrankung"]
+    vorerkrankung = event["vorerkrankungen"]
 
     if age >= 60:
         prio = 1
@@ -49,7 +49,7 @@ def writeItem(event, context):
             'Geschlecht': event["geschlecht"],
             'Priorisierungsgruppe': prio,
             'Systemrelevanz': sysRel,
-            'Vorerkrankung': vorerkrankung,
+            'Vorerkrankungen': vorerkrankung,
             'Version': versionNumber,
             'secret': event["secret"]})
 
