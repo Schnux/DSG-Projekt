@@ -1,4 +1,5 @@
 import boto3
+import botocore
 from boto3.dynamodb.conditions import Key
 
 
@@ -28,38 +29,45 @@ def addFreeDates(event, context):
 
         if entries:
             for termin in event["Termine"]:
-                vaccTableM.update_item(
-                    Key={
-                        'ID': entries[i]["ID"]
-                    },
-                    UpdateExpression="SET Termin = :t",
-                    ExpressionAttributeValues={
-                        ':t': datum+"-"+termin
-                    },
-                    ReturnValues="UPDATED_NEW"
-                )
-                ses.send_email(
-                    Source='maximilian.goetz@stud.uni-bamberg.de',
-                    Destination={
-                        'ToAddresses': [
-                            entries[i]["Mail"]
-                        ]
-                    },
-                    Message={
-                        'Subject': {
-                            'Data': 'Impftermin',
-                            'Charset': 'utf-8'
+                if len(entries) > i:
+                    vaccTableM.update_item(
+                        Key={
+                            'ID': entries[i]["ID"]
                         },
-                        'Body': {
-                            'Text': {
-                                'Data': "Ihr Impftermin ist am "+datum+", um "+termin+" Uhr.",
-                                'Charset': 'utf-8'
+                        UpdateExpression="SET Termin = :t",
+                        ExpressionAttributeValues={
+                            ':t': datum+"-"+termin
+                        },
+                        ReturnValues="UPDATED_NEW"
+                    )
+                    try:
+                        ses.send_email(
+                            Source='maximilian.goetz@stud.uni-bamberg.de',
+                            Destination={
+                                'ToAddresses': [
+                                    entries[i]["Mail"]
+                                ]
+                            },
+                            Message={
+                                'Subject': {
+                                    'Data': 'Impftermin',
+                                    'Charset': 'utf-8'
+                                },
+                                'Body': {
+                                    'Text': {
+                                        'Data': "Ihr Impftermin ist am "+datum+", um "+termin+" Uhr.",
+                                        'Charset': 'utf-8'
+                                    }
+                                }
                             }
-                        }
-                    }
-                )
-                termine.remove(termin)
-                i = i+1
+                        )
+                    except botocore.exceptions.ClientError as e:
+                        print("No email send")
+
+                    termine.remove(termin)
+                    i = i+1
+                else:
+                    break
 
         existingDates = datesTableM.query(
             TableName='datesTableM',

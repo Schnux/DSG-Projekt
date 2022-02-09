@@ -23,7 +23,7 @@ def lambda_handler(event, context):
 
         authorizationToken = event['authorizationToken'].split('|')
         mail = authorizationToken[0]
-        userToken = int(authorizationToken[1])
+        userToken = authorizationToken[1]
 
         response = table.scan(FilterExpression=Attr(
             "Mail").eq(mail) & Attr("secret").eq(userToken))
